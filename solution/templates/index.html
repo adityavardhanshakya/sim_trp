@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Simpson and Trap</title>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
+<body>
+    {% csrf_token %}
+    <h1>Trapizodial and Simpson Rules</h1>
+    
+    <div class="container-fluid">
+        <div class="row mt-5">
+            <div class="col-md-4 mt-3">
+                <div class="row my-3">
+                    <input type="text" id="lower" placeholder="Lower Limit" class="form-control" />
+                </div>
+                <div class="row my-3">
+                    <input type="text" id="upper" placeholder="Upper Limit" class="form-control" />
+                </div>
+                <div class="row my-3">
+                    <input type="text" id="interval" placeholder="Interval" class="form-control" />
+                </div>
+                <div class="row">
+                    <button onclick="calculate()" class="form-control btn-primary">Submit</button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <h2>Trapzoidal</h2>
+                <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+                <h3 id="trpv">Val:</h3>
+            </div>
+            <div class="col-md-4">
+                <h2>Simpson</h2>
+                <canvas id="simp" style="width:100%;max-width:600px"></canvas>
+                <h3 id="simv">Val:</h3>                
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+    <script>
+        function calculate(){
+            $.ajax({
+                url:'/api/sol',
+                method:'POST',
+                data:{
+                    'lower':$('#lower').val(),
+                    'upper':$('#upper').val(),
+                    'interval':$('#interval').val()
+                },
+                success:function(e){
+                    var data = JSON.parse(e)
+
+                    console.log("Simpson")
+                    console.log(data['simp']['val'])
+                    console.log(data['simp']['x'])
+                    console.log(data['simp']['int'])
+                    $('#simv').html(data['simp']['val'])
+                    new Chart("myChart", {
+                        type: "line",
+                        data: {
+                            labels: data['simp']['int'],
+                            datasets: [{
+                                fill: false,
+                                lineTension: 0,
+                                backgroundColor: "rgba(0,0,255,1.0)",
+                                borderColor: "rgba(0,0,255,0.1)",
+                                data: data['simp']['x']
+                            }]
+                        }
+                    });
+                    console.log("\n\nTrapizodal")
+                    console.log(data['trap']['val'])
+                    console.log(data['trap']['x'])
+                    console.log(data['trap']['int'])
+                    new Chart("simp", {
+                        type: "line",
+                        data: {
+                            labels: data['trap']['x'],
+                                datasets: [{
+                                fill: false,
+                                lineTension: 0,
+                                backgroundColor: "rgba(0,0,255,1.0)",
+                                borderColor: "rgba(0,0,255,0.1)",
+                                data: data['trap']['int']
+                            }]
+                        }
+                    });
+                    $('#trpv').html(data['trap']['val'])
+                }
+            })
+        }
+        const xValues = [50,60,70,80,90,100,110,120,130,140,150];
+        const yValues = [7,8,8,9,9,9,10,11,14,14,15];
+
+        
+    </script>
+    <script>
+        
+    </script>
+
+</body>
+
+</html>
